@@ -13,7 +13,9 @@ public class ScreenManager : MonoBehaviour {
 	private const float FADE_IN_OUT_TIME = 1f;
 	private FadingManger fManager;
 	private Communication communication;
-	private LoginForm form;
+	private LoginForm loginForm;
+	private GameStageForm gameStageDataForm; 
+	private GameStageData gameStageData;
 	private bool canLogin, started, levelSelected, startedPlaying, isEndedGame, logouted;
 	private string playSceneName;
 
@@ -59,7 +61,8 @@ public class ScreenManager : MonoBehaviour {
 		levelSelected = false;
 		startedPlaying = false;
         logouted = false;
-		form = FindObjectOfType<LoginForm> ();
+		loginForm = FindObjectOfType<LoginForm> ();
+		gameStageDataForm = FindObjectOfType<GameStageForm> ();
 	}
 
 	void Start(){
@@ -67,11 +70,19 @@ public class ScreenManager : MonoBehaviour {
 	}
 
 	public void loginValid(string email, string password){
-		form.submitForm (email, password, false);
+		loginForm.submitForm (email, password, false);
 	}
 
 	private void loginResult (bool result){
-		canLogin = result;
+		if (result == true){
+			gameStageDataForm.gameStageDataRequest ();
+		}
+	}
+
+	private void getStageDataResult (GameStageData data){
+		gameStageData = data;
+		canLogin = true;
+		print ("Result: " + gameStageData.printAllLevels ());
 	}
 
     public void logout()

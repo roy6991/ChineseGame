@@ -15,6 +15,8 @@ public class LoginForm : MonoBehaviour {
 		sm = FindObjectOfType<ScreenManager> ();
 	}
 
+	// for login
+
 	public void submitForm (string email, string password, bool remember) {
 		StartCoroutine(submitLoginForm(email, password, remember.ToString()));
 	}
@@ -28,7 +30,6 @@ public class LoginForm : MonoBehaviour {
 		form.AddField ("api", "");
 		// Upload to a cgi script
 		WWW w = new WWW(url + "login", form);
-        print(url + "login");
 		yield return w;
 		if (!string.IsNullOrEmpty(w.error)) {
 			print(w.error);
@@ -56,6 +57,8 @@ public class LoginForm : MonoBehaviour {
 	private void onFail (){
 		sm.SendMessage ("loginResult", false);
 	}
+
+	// for logout
 
     public void LogoutRequest()
     {
