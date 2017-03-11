@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SimpleJSON;
+using System.Text;
 
 public class GameStageForm : MonoBehaviour {
 
@@ -19,20 +20,20 @@ public class GameStageForm : MonoBehaviour {
 	}
 
 	private IEnumerator getStageData(){
-		WWW w = new WWW(url + "stage");
+		WWW w = new WWW(url + "stage",null, Account.instance.getAccountHeader ());
 		yield return w;
+
 		if (!string.IsNullOrEmpty(w.error)) {
 			print(w.error);
 			//onFail ();
 		}
 		else {
-			print(w.text);
 			var N = JSONNode.Parse (w.text);
 			error = N ["error"].AsBool;
 			if (error){
 				//onFail ();
 			} else {
-				print (N ["currentLevel"] [0].Value);
+				//print (N ["currentLevel"] [0].Value);
 				int game1 = N ["currentLevel"] [0] ["level"].AsInt;
 				int game2 = N ["currentLevel"] [1] ["level"].AsInt;
 				int game3 = N ["currentLevel"] [2] ["level"].AsInt;

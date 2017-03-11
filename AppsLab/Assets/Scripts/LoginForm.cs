@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using SimpleJSON;
+using UnityEngine.Networking;
 
 public class LoginForm : MonoBehaviour {
 
@@ -9,6 +11,8 @@ public class LoginForm : MonoBehaviour {
 
 	private bool error = false;
 	private string username = "";
+	private string sessionId;
+	private Dictionary<string,string> headers = new Dictionary<string, string>();
 
 	// Use this for initialization
 	void Awake () {
@@ -28,22 +32,35 @@ public class LoginForm : MonoBehaviour {
 		form.AddField ("password", password);
 		form.AddField ("remember", remember);
 		form.AddField ("api", "");
-		// Upload to a cgi script
+
+
 		WWW w = new WWW(url + "login", form);
+
 		yield return w;
+		//this.GetSessionId (w.responseHeaders);
+
+		//Account.instance.setCookie(w.responseHeaders["Set-Cookie"]);
+		//Account.instance.setCookie(w.responseHeaders["Set-Cookie"]);
+
 		if (!string.IsNullOrEmpty(w.error)) {
 			print(w.error);
 			onFail ();
 		}
 		else {
-			print(w.text);
 			var N = JSONNode.Parse (w.text);
 			error = N ["error"].AsBool;
 			if (error){
 				onFail ();
 			} else {
 				username = N["user"] ["name"].Value;
+
 				onSuccess ();
+
+				using (UnityWebRequest request = new UnityWebRequest(url+"stage","Get")) {
+					yield return request.Send ();
+					print (request.downloadHandler.text);
+				}
+
 			}
 		}
 	}
@@ -51,7 +68,8 @@ public class LoginForm : MonoBehaviour {
 	private void onSuccess (){
 		sm.SendMessage ("loginResult", true);
 		sm.AssignPlayerName (username);
-		print (username);
+
+
 	}
 
 	private void onFail (){
@@ -86,6 +104,26 @@ public class LoginForm : MonoBehaviour {
             {
                 // success
                 sm.logout();
+            }
+        }
+    }
+	private void GetSessionId(Dictionary<string , string> responseHeaders){
+
+        foreach(KeyValuePair<string , string> header in responseHeaders){
+
+            Debug.Log(string.Format("{0} : {1}" , header.Key , header.Value));
+
+            if(header.Key == "SET-COOKIE"){
+
+                string[] cookies = header.Value.Split(';');
+                for(int i = 0 ; i < cookies.Length ; i++){
+
+                    if(cookies[i].Split('=')[0] == "PHPSESSID" && !this.headers.ContainsKey("COOKIE")){
+                        this.sessionId = cookies[i];
+                        this.headers.Add("COOKIE" , this.sessionId);
+                        break;
+                    }
+                }
             }
         }
     }

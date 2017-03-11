@@ -70,7 +70,7 @@ public class ScreenManager : MonoBehaviour {
 	}
 
 	public void loginValid(string email, string password){
-		loginForm.submitForm (email, password, false);
+		loginForm.submitForm (email, password, true);
 	}
 
 	private void loginResult (bool result){
@@ -109,7 +109,7 @@ public class ScreenManager : MonoBehaviour {
 		// Load loading screen
 		yield return Application.LoadLevelAsync("LoadingScene");
 		if(fManager == null){
-			Debug.Log ("is null");
+			//Debug.Log ("is null");
 			fManager = GameObject.FindObjectOfType(typeof(FadingManger)) as FadingManger;
 			fManager.processFadeIn ();
 
